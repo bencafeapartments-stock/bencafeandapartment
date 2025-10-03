@@ -25,7 +25,7 @@
                         <i class="fas fa-building text-white text-3xl"></i>
                     </div>
                     <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
-                        Welcome Back
+                        Welcome Back - LOCAL SERVER TESTING
                     </h2>
                     <p class="mt-2 text-sm text-gray-600">
                         Sign in to your Cafe & Apartment Management account
