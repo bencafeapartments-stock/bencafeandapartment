@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Staff Report - {{ $reportData['generated_at'] ?? 'Unknown Date' }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 15px;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #059669;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            color: #059669;
+            margin: 0 0 10px 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .header .meta {
+            color: #6b7280;
+            font-size: 10px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+
+        .section h2 {
+            color: #374151;
+            font-size: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 5px;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .stats-row {
+            display: table-row;
+        }
+
+        .stats-cell {
+            display: table-cell;
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            width: 20%;
+            text-align: center;
+        }
+
+        .stats-cell-wide {
+            width: 25%;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #059669;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 9px;
+            color: #6b7280;
+            margin-top: 3px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .table th,
+        .table td {
+            border: 1px solid #e5e7eb;
+            padding: 6px;
+            text-align: left;
+            font-size: 10px;
+        }
+
+        .table th {
+            background-color: #f3f4f6;
+            font-weight: bold;
+        }
+
+        .two-column {
+            display: table;
+            width: 100%;
+        }
+
+        .column {
+            display: table-cell;
+            width: 48%;
+            vertical-align: top;
+            padding-right: 2%;
+        }
+
+        .activity-item {
+            padding: 6px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 3px;
+            font-size: 10px;
+        }
+
+        .activity-type {
+            font-weight: bold;
+            color: #059669;
+            text-transform: capitalize;
+        }
+
+        .activity-date {
+            color: #6b7280;
+            font-size: 9px;
+            float: right;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            color: #6b7280;
+            font-size: 9px;
+        }
+
+        .summary-box {
+            background-color: #f0fdf4;
+            border: 1px solid #22c55e;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .summary-box h3 {
+            color: #059669;
+            margin: 0 0 8px 0;
+            font-size: 12px;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px dotted #e5e7eb;
+        }
+
+        .metric-item:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-weight: normal;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: #059669;
+        }
+
+        .tenant-highlight {
+            background-color: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tenant-highlight h3 {
+            color: #0369a1;
+            margin: 0 0 8px 0;
+            font-size: 12px;
+        }
+
+        .apartment-highlight {
+            background-color: #fff7ed;
+            border: 1px solid #f97316;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .apartment-highlight h3 {
+            color: #c2410c;
+            margin: 0 0 8px 0;
+            font-size: 12px;
+        }
+
+        @page {
+            margin: 0.5in;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Staff Performance Report</h1>
+        <div class="meta">
+            Generated on: {{ $reportData['generated_at'] ?? 'Unknown Date' }}<br>
+            Generated by: {{ $reportData['generated_by'] ?? 'Unknown User' }}<br>
+            Report Period: {{ $reportData['period'] ?? 'Unknown Period' }}
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="summary-box">
+            <h3>Executive Summary</h3>
+            <div class="metric-item">
+                <span class="metric-label">Tasks Completed Today:</span>
+                <span class="metric-value">{{ $reportData['today']['completed_tasks'] ?? 0 }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Pending Tasks:</span>
+                <span class="metric-value">{{ $reportData['today']['pending_tasks'] ?? 0 }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Today's Revenue:</span>
+                <span class="metric-value">₱{{ number_format($reportData['today']['revenue'] ?? 0, 2) }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Active Tenants:</span>
+                <span class="metric-value">{{ $reportData['today']['active_tenants'] ?? 0 }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Active Apartments:</span>
+                <span class="metric-value">{{ $reportData['today']['active_apartments'] ?? 0 }}</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="section">
+        <h2>Today's Performance</h2>
+        <div class="stats-grid">
+            <div class="stats-row">
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['today']['completed_tasks'] ?? 0 }}</span>
+                    <div class="stat-label">Tasks Completed</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['today']['pending_tasks'] ?? 0 }}</span>
+                    <div class="stat-label">Pending Tasks</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">₱{{ number_format($reportData['today']['revenue'] ?? 0, 0) }}</span>
+                    <div class="stat-label">Revenue Today</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['today']['orders_processed'] ?? 0 }}</span>
+                    <div class="stat-label">Orders Processed</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['today']['active_apartments'] ?? 0 }}</span>
+                    <div class="stat-label">Active Apartments</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Weekly Performance</h2>
+        <div class="stats-grid">
+            <div class="stats-row">
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['week']['completed_maintenance'] ?? 0 }}</span>
+                    <div class="stat-label">Maintenance Completed</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['week']['total_orders'] ?? 0 }}</span>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">₱{{ number_format($reportData['week']['total_revenue'] ?? 0, 0) }}</span>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['week']['new_tenants'] ?? 0 }}</span>
+                    <div class="stat-label">New Tenants</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['week']['new_apartment_assignments'] ?? 0 }}</span>
+                    <div class="stat-label">New Assignments</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="section">
+        <div class="apartment-highlight">
+            <h3>Apartment Management Overview</h3>
+            <div class="metric-item">
+                <span class="metric-label">Total Apartments:</span>
+                <span class="metric-value">{{ $reportData['apartment_stats']['total_apartments'] ?? 0 }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Currently Occupied:</span>
+                <span class="metric-value">{{ $reportData['apartment_stats']['active_apartments'] ?? 0 }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Available for Rent:</span>
+                <span class="metric-value">{{ $reportData['apartment_stats']['available_apartments'] ?? 0 }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Under Maintenance:</span>
+                <span class="metric-value">{{ $reportData['apartment_stats']['maintenance_apartments'] ?? 0 }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Overall Occupancy Rate:</span>
+                <span class="metric-value">{{ $reportData['apartment_stats']['occupancy_rate'] ?? 0 }}%</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Monthly Occupancy Trend:</span>
+                <span class="metric-value">{{ $reportData['apartment_stats']['occupancy_trend'] ?? 0 }}%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Apartment Occupancy by Type</h2>
+        @if (isset($reportData['apartment_stats']['apartments_by_type']) &&
+                !empty($reportData['apartment_stats']['apartments_by_type']))
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Apartment Type</th>
+                        <th>Total Units</th>
+                        <th>Occupied</th>
+                        <th>Available</th>
+                        <th>Occupancy Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($reportData['apartment_stats']['apartments_by_type'] as $typeData)
+                        <tr>
+                            <td>{{ ucfirst($typeData['type']) }}</td>
+                            <td>{{ $typeData['total'] }}</td>
+                            <td>{{ $typeData['occupied'] }}</td>
+                            <td>{{ $typeData['total'] - $typeData['occupied'] }}</td>
+                            <td>{{ $typeData['occupancy_rate'] }}%</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div style="text-align: center; color: #6b7280; padding: 20px;">
+                No apartment type data available
+            </div>
+        @endif
+    </div>
+
+    <div class="section">
+        <h2>Average Monthly Rent by Apartment Type</h2>
+        @if (isset($reportData['apartment_stats']['avg_rent_by_type']) &&
+                !empty($reportData['apartment_stats']['avg_rent_by_type']))
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Apartment Type</th>
+                        <th>Average Monthly Rent</th>
+                        <th>Revenue Potential</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($reportData['apartment_stats']['avg_rent_by_type'] as $rentData)
+                        @php
+                            $typeUnits = collect(
+                                $reportData['apartment_stats']['apartments_by_type'] ?? [],
+                            )->firstWhere('type', $rentData->apartment_type);
+                            $totalUnits = $typeUnits['total'] ?? 0;
+                            $revenueIfFullyOccupied = $rentData->avg_rent * $totalUnits;
+                        @endphp
+                        <tr>
+                            <td>{{ ucfirst($rentData->apartment_type) }}</td>
+                            <td>₱{{ number_format($rentData->avg_rent, 2) }}</td>
+                            <td>₱{{ number_format($revenueIfFullyOccupied, 2) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <div style="text-align: center; color: #6b7280; padding: 20px;">
+                No rent data available
+            </div>
+        @endif
+    </div>
+
+    @if (isset($reportData['apartment_stats']['performance_metrics']))
+        <div class="section">
+            <h2>Apartment Performance Metrics</h2>
+            <div class="stats-grid">
+                <div class="stats-row">
+                    <div class="stats-cell stats-cell-wide">
+                        <span
+                            class="stat-value">{{ $reportData['apartment_stats']['performance_metrics']['avg_vacancy_duration'] ?? 0 }}</span>
+                        <div class="stat-label">Avg Vacancy Duration (Days)</div>
+                    </div>
+                    <div class="stats-cell stats-cell-wide">
+                        <span
+                            class="stat-value">{{ $reportData['apartment_stats']['performance_metrics']['turnover_rate'] ?? 0 }}%</span>
+                        <div class="stat-label">Turnover Rate (3 months)</div>
+                    </div>
+                    <div class="stats-cell stats-cell-wide">
+                        <span
+                            class="stat-value">{{ $reportData['apartment_stats']['performance_metrics']['avg_lease_duration'] ?? 0 }}</span>
+                        <div class="stat-label">Avg Lease Duration (Months)</div>
+                    </div>
+                    <div class="stats-cell stats-cell-wide">
+                        <span
+                            class="stat-value">₱{{ number_format($reportData['apartment_stats']['performance_metrics']['revenue_per_apartment'] ?? 0, 0) }}</span>
+                        <div class="stat-label">Avg Revenue per Unit</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+
+    <div class="section">
+        <div class="tenant-highlight">
+            <h3>Tenant Management Overview</h3>
+            <div class="metric-item">
+                <span class="metric-label">Active Tenants:</span>
+                <span class="metric-value">{{ $reportData['tenant_stats']['active_tenants'] ?? 0 }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Total Tenants:</span>
+                <span class="metric-value">{{ $reportData['tenant_stats']['total_tenants'] ?? 0 }}</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Tenant Retention Rate:</span>
+                <span class="metric-value">{{ $reportData['month']['tenant_retention_rate'] ?? 0 }}%</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Average Tenant Stay:</span>
+                <span class="metric-value">{{ $reportData['tenant_stats']['avg_tenant_stay'] ?? 0 }} months</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="section">
+        <h2>Monthly Overview</h2>
+        <div class="two-column">
+            <div class="column">
+                <table class="table">
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Maintenance Completed</td>
+                        <td>{{ $reportData['month']['maintenance_completed'] ?? 0 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Monthly Revenue</td>
+                        <td>₱{{ number_format($reportData['month']['monthly_revenue'] ?? 0, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td>Active Tenants</td>
+                        <td>{{ $reportData['month']['active_tenants'] ?? 0 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Active Apartments</td>
+                        <td>{{ $reportData['apartment_stats']['active_apartments'] ?? 0 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Occupancy Rate</td>
+                        <td>{{ $reportData['month']['occupancy_rate'] ?? 0 }}%</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="column">
+                <table class="table">
+                    <tr>
+                        <th>Billing Statistics</th>
+                        <th>Count</th>
+                    </tr>
+                    <tr>
+                        <td>Total Bills Generated</td>
+                        <td>{{ $reportData['billing_stats']['total_bills_month'] ?? 0 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Bills Paid</td>
+                        <td>{{ $reportData['billing_stats']['paid_bills_month'] ?? 0 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Pending Bills</td>
+                        <td>{{ $reportData['billing_stats']['pending_bills'] ?? 0 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Overdue Bills</td>
+                        <td>{{ $reportData['billing_stats']['overdue_bills'] ?? 0 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Rate</td>
+                        <td>{{ $reportData['billing_stats']['tenant_payment_rate'] ?? 0 }}%</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Tenant Analytics</h2>
+        <div class="two-column">
+            <div class="column">
+                <h3 style="font-size: 12px; margin-bottom: 8px;">Tenant Status Overview</h3>
+                <table class="table">
+                    <tr>
+                        <th>Status</th>
+                        <th>Count</th>
+                    </tr>
+                    <tr>
+                        <td>Active Tenants</td>
+                        <td>{{ $reportData['tenant_stats']['active_tenants'] ?? 0 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Inactive Tenants</td>
+                        <td>{{ $reportData['tenant_stats']['inactive_tenants'] ?? 0 }}</td>
+                    </tr>
+                    <tr>
+                        <td>With Overdue Bills</td>
+                        <td>{{ $reportData['tenant_stats']['tenants_with_overdue_bills'] ?? 0 }}</td>
+                    </tr>
+                    <tr>
+                        <td>New This Month</td>
+                        <td>{{ $reportData['month']['new_tenants_month'] ?? 0 }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="column">
+                <h3 style="font-size: 12px; margin-bottom: 8px;">Performance Metrics</h3>
+                <table class="table">
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Avg Tenant Stay</td>
+                        <td>{{ $reportData['tenant_stats']['avg_tenant_stay'] ?? 0 }} months</td>
+                    </tr>
+                    <tr>
+                        <td>Turnover Rate</td>
+                        <td>{{ $reportData['tenant_stats']['tenant_turnover_rate'] ?? 0 }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Retention Rate</td>
+                        <td>{{ $reportData['month']['tenant_retention_rate'] ?? 0 }}%</td>
+                    </tr>
+                    <tr>
+                        <td>Satisfaction Score</td>
+                        <td>{{ $reportData['performance']['tenant_satisfaction'] ?? 0 }}/5</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Popular Menu Items (This Month)</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Item Name</th>
+                    <th>Orders</th>
+                    <th>Revenue</th>
+                    <th>Avg Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isset($reportData['popular_items']) && !empty($reportData['popular_items']))
+                    @foreach ($reportData['popular_items'] as $index => $item)
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $item['name'] ?? 'Unknown Item' }}</td>
+                            <td>{{ $item['quantity'] ?? 0 }}</td>
+                            <td>₱{{ number_format($item['revenue'] ?? 0, 2) }}</td>
+                            <td>₱{{ number_format($item['avg_price'] ?? 0, 2) }}</td>
+                        </tr>
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #6b7280;">No order data available</td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Maintenance Analysis</h2>
+        <div class="two-column">
+            <div class="column">
+                <h3 style="font-size: 12px; margin-bottom: 8px;">By Category</h3>
+                <table class="table">
+                    <tr>
+                        <th>Category</th>
+                        <th>Count</th>
+                    </tr>
+                    @if (isset($reportData['maintenance_by_category']) && !empty($reportData['maintenance_by_category']))
+                        @foreach ($reportData['maintenance_by_category'] as $category)
+                            <tr>
+                                <td>{{ $category['category'] ?? 'Unknown' }}</td>
+                                <td>{{ $category['count'] ?? 0 }}</td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="2" style="text-align: center; color: #6b7280;">No data available</td>
+                        </tr>
+                    @endif
+                </table>
+            </div>
+            <div class="column">
+                <h3 style="font-size: 12px; margin-bottom: 8px;">By Status</h3>
+                <table class="table">
+                    <tr>
+                        <th>Status</th>
+                        <th>Count</th>
+                    </tr>
+                    @if (isset($reportData['maintenance_by_status']) && !empty($reportData['maintenance_by_status']))
+                        @foreach ($reportData['maintenance_by_status'] as $status)
+                            <tr>
+                                <td>{{ $status['status'] ?? 'Unknown' }}</td>
+                                <td>{{ $status['count'] ?? 0 }}</td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="2" style="text-align: center; color: #6b7280;">No data available</td>
+                        </tr>
+                    @endif
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="section">
+        <h2>Performance Metrics</h2>
+        <div class="stats-grid">
+            <div class="stats-row">
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['performance']['avg_resolution_time'] ?? 0 }}</span>
+                    <div class="stat-label">Avg Resolution (Hours)</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['performance']['task_completion_rate'] ?? 0 }}%</span>
+                    <div class="stat-label">Task Completion Rate</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['performance']['response_time_hours'] ?? 0 }}</span>
+                    <div class="stat-label">Avg Response (Hours)</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['apartment_stats']['occupancy_rate'] ?? 0 }}%</span>
+                    <div class="stat-label">Occupancy Rate</div>
+                </div>
+                <div class="stats-cell">
+                    <span class="stat-value">{{ $reportData['performance']['tenant_satisfaction'] ?? 0 }}</span>
+                    <div class="stat-label">Tenant Satisfaction</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Recent Apartment Activities (Last 7 Days)</h2>
+        @if (isset($reportData['apartment_activities']) && !empty($reportData['apartment_activities']))
+            @foreach ($reportData['apartment_activities'] as $activity)
+                <div class="activity-item">
+                    <span class="activity-date">
+                        @if (isset($activity['date']))
+                            @if (is_object($activity['date']) && method_exists($activity['date'], 'format'))
+                                {{ $activity['date']->format('M j, g:i A') }}
+                            @else
+                                {{ \Carbon\Carbon::parse($activity['date'])->format('M j, g:i A') }}
+                            @endif
+                        @else
+                            Unknown Date
+                        @endif
+                    </span>
+                    <div class="activity-type">{{ ucfirst($activity['type'] ?? 'Unknown') }}</div>
+                    <div>{{ $activity['description'] ?? 'No description' }}</div>
+                    @if (isset($activity['apartment']))
+                        <div style="font-size: 9px; color: #6b7280;">Apartment: {{ $activity['apartment'] }}</div>
+                    @endif
+                    @if (isset($activity['tenant']))
+                        <div style="font-size: 9px; color: #6b7280;">Tenant: {{ $activity['tenant'] }}</div>
+                    @endif
+                    <div style="font-size: 9px; color: #c2410c;">{{ $activity['details'] ?? '' }}</div>
+                </div>
+            @endforeach
+        @else
+            <div style="text-align: center; color: #6b7280; padding: 20px;">
+                No recent apartment activities recorded
+            </div>
+        @endif
+    </div>
+
+
+    <div class="section">
+        <h2>Recent Tenant Activities (Last 7 Days)</h2>
+        @if (isset($reportData['tenant_activities']) && !empty($reportData['tenant_activities']))
+            @foreach ($reportData['tenant_activities'] as $activity)
+                <div class="activity-item">
+                    <span class="activity-date">
+                        @if (isset($activity['date']))
+                            @if (is_object($activity['date']) && method_exists($activity['date'], 'format'))
+                                {{ $activity['date']->format('M j, g:i A') }}
+                            @else
+                                {{ \Carbon\Carbon::parse($activity['date'])->format('M j, g:i A') }}
+                            @endif
+                        @else
+                            Unknown Date
+                        @endif
+                    </span>
+                    <div class="activity-type">{{ ucfirst($activity['type'] ?? 'Unknown') }}</div>
+                    <div>{{ $activity['description'] ?? 'No description' }}</div>
+                    @if (isset($activity['tenant']))
+                        <div style="font-size: 9px; color: #6b7280;">Tenant: {{ $activity['tenant'] }}</div>
+                    @endif
+                    <div style="font-size: 9px; color: #059669;">{{ $activity['details'] ?? '' }}</div>
+                </div>
+            @endforeach
+        @else
+            <div style="text-align: center; color: #6b7280; padding: 20px;">
+                No recent tenant activities recorded
+            </div>
+        @endif
+    </div>
+
+    <div class="section">
+        <h2>General Activities (Last 7 Days)</h2>
+        @if (isset($reportData['recent_activities']) && !empty($reportData['recent_activities']))
+            @foreach ($reportData['recent_activities'] as $activity)
+                <div class="activity-item">
+                    <span class="activity-date">
+                        @if (isset($activity['date']))
+                            @if (is_object($activity['date']) && method_exists($activity['date'], 'format'))
+                                {{ $activity['date']->format('M j, g:i A') }}
+                            @else
+                                {{ \Carbon\Carbon::parse($activity['date'])->format('M j, g:i A') }}
+                            @endif
+                        @else
+                            Unknown Date
+                        @endif
+                    </span>
+                    <div class="activity-type">{{ ucfirst($activity['type'] ?? 'Unknown') }}</div>
+                    <div>{{ $activity['description'] ?? 'No description' }}</div>
+                    @if (isset($activity['staff']))
+                        <div style="font-size: 9px; color: #6b7280;">Staff: {{ $activity['staff'] }}</div>
+                    @endif
+                    <div style="font-size: 9px; color: #059669;">{{ $activity['details'] ?? '' }}</div>
+                </div>
+            @endforeach
+        @else
+            <div style="text-align: center; color: #6b7280; padding: 20px;">
+                No recent general activities recorded
+            </div>
+        @endif
+    </div>
+
+
+    <div class="footer">
+        <p>This report was automatically generated by the Staff Management System</p>
+        <p>For questions or concerns, please contact the system administrator</p>
+        <p>Report generated on {{ now()->format('F j, Y \a\t g:i A') }}</p>
+        <p><strong>Enhanced Apartment Reporting:</strong> This report now includes comprehensive apartment management
+            statistics, occupancy tracking, performance metrics, and recent apartment activities to provide better
+            insights into property management efficiency.</p>
+    </div>
+</body>
+
+</html>
